@@ -1,0 +1,17 @@
+- hosts: KubernetesMaster
+  become: yes
+
+  tasks:
+    - name: Apply Deployment
+      kubernetes.core.k8s:
+        kubeconfig: /home/jenkins/.kube/config
+        state: present
+        src: playbook/k8s/deployment.yml
+      delegate_to: localhost
+
+    - name: Apply Service
+      kubernetes.core.k8s:
+        kubeconfig: /home/jenkins/.kube/config
+        state: present
+        src: playbook/k8s/service.yml
+      delegate_to: localhost
