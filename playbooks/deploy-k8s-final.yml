@@ -1,0 +1,29 @@
+---
+- name: Deploy XYZ Tech to Kubernetes
+  hosts: k8s_master
+  become: yes
+
+  tasks:
+
+    - name: Copy Deployment YAML
+      copy:
+        src: xyztech-deployment.yml
+        dest: /tmp/xyztech-deployment.yml
+
+    - name: Copy Service YAML
+      copy:
+        src: xyztech-service.yml
+        dest: /tmp/xyztech-service.yml
+
+    - name: Apply Deployment
+      shell: kubectl apply -f /tmp/xyztech-deployment.yml
+
+    - name: Apply Service
+      shell: kubectl apply -f /tmp/xyztech-service.yml
+
+    - name: Check Status
+      shell: kubectl get pods,svc -l app=xyztech-app
+      register: output
+
+    - debug:
+        var: output.stdout_lines
