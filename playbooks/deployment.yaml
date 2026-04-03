@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zyxtech-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: zyxtech
+  template:
+    metadata:
+      labels:
+        app: zyxtech
+    spec:
+      containers:
+      - name: zyxtech-container
+        image: nrawal2024/zyxtech_app:latest
+        ports:
+        - containerPort: 8080
