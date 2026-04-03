@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xyztech-deployment
+  labels:
+    app: xyztech-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: xyztech-app
+  template:
+    metadata:
+      labels:
+        app: xyztech-app
+    spec:
+      containers:
+      - name: myxyz-tech
+        image: nrawal2024/tech_app:v3
+        ports:
+        - containerPort: 8080
