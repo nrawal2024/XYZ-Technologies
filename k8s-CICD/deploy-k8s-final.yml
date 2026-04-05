@@ -1,0 +1,2 @@
+kubectl apply -f /tmp/xyztech-deployment.yml --insecure-skip-tls-verify || true
+kubectl apply -f /tmp/xyztech-service.yml --insecure-skip-tls-verify || true
