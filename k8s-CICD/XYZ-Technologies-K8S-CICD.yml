@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+
+    environment {
+        WORK_DIR = "/var/lib/jenkins/workspace/Project02/Project02-XYZ-Technologies/XYZ-Technologies-K8S-CICD"
+    }
+
+    stages {
+
+        stage('Prepare Workspace') {
+            steps {
+                dir("${WORK_DIR}") {
+                    sh 'ls -l'
+                }
+            }
+        }
+
+        stage('Ansible Ping Test') {
+            steps {
+                dir("${WORK_DIR}") {
+                    sh 'ansible -i hosts.ini all -m ping'
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                dir("${WORK_DIR}") {
+                    sh 'ansible-playbook -i hosts.ini playbook/deploy-k8s-final.yml'
+                }
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                dir("${WORK_DIR}") {
+                    sh '''
+                    ssh -o StrictHostKeyChecking=no ubuntu@172.31.1.99 "
+                    kubectl get pods;
+                    kubectl get svc
+                    "
+                    '''
+                }
+            }
+        }
+    }
+}
