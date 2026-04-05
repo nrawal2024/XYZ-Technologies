@@ -1,0 +1,69 @@
+pipeline {
+    agent any
+
+    environment {
+        WORK_DIR = "/var/lib/jenkins/workspace/Project02"
+    }
+
+    stages {
+
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+
+        stage('Code Checkout') {
+            steps {
+                git 'https://github.com/nrawal2024/XYZ-Technologies.git'
+            }
+        }
+
+        stage('Build Code') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t nrawal2024/zyxtech_app:latest .'
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                    echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    '''
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                sh 'docker push nrawal2024/zyxtech_app:latest'
+            }
+        }
+
+        stage('Stop Old Container') {
+            steps {
+                sh '''
+                docker ps -q --filter "publish=8081" | grep -q . && docker stop $(docker ps -q --filter "publish=8081") || true
+                docker ps -aq --filter "publish=8081" | grep -q . && docker rm $(docker ps -aq --filter "publish=8081") || true
+                '''
+            }
+        }
+
+        stage('Run New Container') {
+            steps {
+                sh 'docker run -d -p 8081:8080 --name zyxtech_app nrawal2024/zyxtech_app:latest'
+            }
+        }
+    }
+}
